@@ -26,8 +26,11 @@ class Clock extends React.Component<ClockProps, ClockState> {
       const currentTime = new Date();
 
       this.setState({ time: currentTime });
-      console.log(currentTime.toUTCString().slice(-12, -4));
     }, 1000);
+  }
+
+  componentDidUpdate() {
+    console.log(this.state.time.toUTCString().slice(-12, -4));
   }
 
   componentWillUnmount() {
@@ -59,19 +62,11 @@ class App extends React.Component<{}, AppState> {
   state: AppState = {
     hasClock: true,
     clockName: 'Clock-0',
+    time: new Date(),
   };
 
   componentDidMount() {
-    this.nameChangeTimer = window.setInterval(() => {
-      this.setState((prevState: AppState) => {
-        const newName = getRandomName();
-
-        console.warn(`Renamed from ${prevState.clockName} to ${newName}`);
-
-        return { clockName: newName };
-      });
-    }, 3300);
-
+    this.startNameChangeTimer();
     document.addEventListener('contextmenu', this.handleRightClick);
     document.addEventListener('click', this.handleLeftClick);
   }
@@ -82,13 +77,28 @@ class App extends React.Component<{}, AppState> {
     clearInterval(this.nameChangeTimer);
   }
 
+  startNameChangeTimer() {
+    this.nameChangeTimer = window.setInterval(() => {
+      this.setState((prevState: AppState) => {
+        const newName = getRandomName();
+
+        console.warn(`Renamed from ${prevState.clockName} to ${newName}`);
+
+        return { clockName: newName };
+      });
+    }, 3300);
+  }
+
   handleRightClick = (event: MouseEvent) => {
     event.preventDefault();
     this.setState({ hasClock: false });
+    clearInterval(this.nameChangeTimer);
   };
 
   handleLeftClick = () => {
-    this.setState({ hasClock: true, time: new Date() });
+    this.setState({ hasClock: true, time: new Date() }, () => {
+      this.startNameChangeTimer();
+    });
   };
 
   render() {
