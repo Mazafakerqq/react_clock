@@ -96,7 +96,7 @@ class App extends React.Component<{}, AppState> {
   };
 
   handleLeftClick = () => {
-    this.setState({ hasClock: true, time: new Date() }, () => {
+    this.setState({ hasClock: true }, () => {
       this.startNameChangeTimer();
     });
   };
